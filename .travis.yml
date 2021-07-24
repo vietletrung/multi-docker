@@ -1,0 +1,35 @@
+sudo: required
+service:
+  - docker
+
+before_install:
+  - docker build -t vietletrung/react-test -f ./client/Dockerfile.dev .
+
+script:
+  - docker run -e CI=true vietletrung/react-test npm run test -- --coverage
+
+after_success:
+  - docker build -t vietletrung/multi-client ./client
+  - docker build -t vietletrung/multi-nginx ./nginx
+  - docker build -t vietletrung/multi-server ./server
+    - docker build -t vietletrung/multi-worker ./worker
+
+#login to docker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push vietletrung/multi-client
+  - docker push vietletrung/multi-nginx
+  - docker push vietletrung/multi-server
+  - docker push vietletrung/multi-worker
+  
+#deploy:
+#  provider: elasticbeanstalk
+#  region: "us-east-2"
+#  app: "docker"
+#  env: "Docker-env"
+#  bucker_name: "elasticbeanstalk-us-east-2-883158296135"
+#  bucker_path: "path"
+#  on:
+#    branch: master
+#  access_key_id: $AWS_ACCESS_KEY
+#  secret_access_key: "$AWS_SECRET_KEY"
+
