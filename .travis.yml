@@ -3,7 +3,7 @@ service:
   - docker
 
 before_install:
-  - docker build -t vietletrung/react-test -f ./client/Dockerfile.dev .
+  - docker build -t vietletrung/react-test -f ./client/Dockerfile.dev ./client
 
 script:
   - docker run -e CI=true vietletrung/react-test npm run test -- --coverage
